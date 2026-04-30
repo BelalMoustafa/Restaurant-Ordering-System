@@ -1,10 +1,14 @@
 <?php
 define('APP_RUNNING', true);
-$pageTitle = 'Our Menu';
-require_once __DIR__ . '/../includes/header.php';
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../config/db.php';
 
-requireLogin();
+requireUser();
 
 $stmtMenu = $conn->prepare(
     'SELECT id, name, description, price, category, image_path
@@ -24,6 +28,9 @@ foreach ($allItems as $item) {
 
 $pdfPath   = __DIR__ . '/../uploads/pdfs/menu.pdf';
 $pdfExists = file_exists($pdfPath);
+
+$pageTitle = 'Our Menu';
+require_once __DIR__ . '/../includes/header.php';
 ?>
     <div class="page-header">
         <h1>Our Menu</h1>

@@ -1,10 +1,18 @@
 <?php
 define('APP_RUNNING', true);
-$pageTitle = 'Place an Order';
-require_once __DIR__ . '/../includes/header.php';
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../config/db.php';
 
-requireLogin();
+requireUser();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireValidCsrf('place_order.php');
+}
 
 $stmtItems = $conn->prepare(
     'SELECT id, name, price FROM menu_items WHERE is_available = 1 ORDER BY name ASC'
@@ -90,6 +98,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 }
+
+$pageTitle = 'Place an Order';
+require_once __DIR__ . '/../includes/header.php';
 ?>
     <div class="page-header">
         <h1>Place an Order</h1>
@@ -103,13 +114,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="card">
         <div class="card-title">Order Details</div>
         <form id="order-form" method="POST" action="place_order.php" novalidate>
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrfToken(), ENT_QUOTES, 'UTF-8') ?>">
             <div class="form-group">
                 <label for="menu_item_id">Select Item <span class="text-danger">*</span></label>
                 <?php if (empty($availableItems)): ?>
                     <p class="text-muted">No items are currently available. Please check back later.</p>
                 <?php else: ?>
                     <select id="menu_item_id" name="menu_item_id" required>
-                        <option value="" data-price="0">— Choose a menu item —</option>
+                        <option value="" data-price="0">&mdash; Choose a menu item &mdash;</option>
                         <?php foreach ($availableItems as $menuItem): ?>
                             <option value="<?= (int) $menuItem['id'] ?>" data-price="<?= number_format((float) $menuItem['price'], 2, '.', '') ?>" <?= $selectedItemId === (int) $menuItem['id'] ? 'selected' : '' ?>>
                                 <?= htmlspecialchars($menuItem['name'], ENT_QUOTES, 'UTF-8') ?> &mdash; $<?= number_format((float) $menuItem['price'], 2) ?>

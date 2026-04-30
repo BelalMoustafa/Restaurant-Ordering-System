@@ -33,7 +33,13 @@ if (!isLoggedIn() && isset($_COOKIE['remember_user'])) {
             $_SESSION['user_id']   = $cookieUser['id'];
             $_SESSION['role']      = $cookieUser['role'];
             $_SESSION['user_name'] = $cookieUser['name'];
-            setcookie('remember_user', $newToken, time() + (30 * 24 * 60 * 60), '/', '', false, true);
+            setcookie('remember_user', $newToken, [
+                'expires'  => time() + (30 * 24 * 60 * 60),
+                'path'     => '/',
+                'secure'   => false,
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
             if ($cookieUser['role'] === 'admin') {
                 header('Location: ../admin/dashboard.php');
             } else {
@@ -51,6 +57,8 @@ if (!isLoggedIn() && isset($_COOKIE['remember_user'])) {
 requireGuest();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireValidCsrf('login.php');
+
     $rawEmail    = trim($_POST['email']    ?? '');
     $rawPassword = $_POST['password']      ?? '';
     $rememberMe  = isset($_POST['remember_me']) && $_POST['remember_me'] === '1';
@@ -90,7 +98,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmtToken->bind_param('si', $tokenHash, $user['id']);
                 $stmtToken->execute();
                 $stmtToken->close();
-                setcookie('remember_user', $token, time() + (30 * 24 * 60 * 60), '/', '', false, true);
+                setcookie('remember_user', $token, [
+                    'expires'  => time() + (30 * 24 * 60 * 60),
+                    'path'     => '/',
+                    'secure'   => false,
+                    'httponly' => true,
+                    'samesite' => 'Lax',
+                ]);
             } else {
                 $emptyToken = null;
                 $stmtClear  = $conn->prepare('UPDATE users SET remember_token = ? WHERE id = ?');
@@ -132,6 +146,7 @@ if (isset($_GET['logged_out']) && $_GET['logged_out'] === '1') {
             </div>
         <?php endif; ?>
         <form id="login-form" method="POST" action="login.php" novalidate>
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrfToken(), ENT_QUOTES, 'UTF-8') ?>">
             <div class="form-group">
                 <label for="email">Email Address</label>
                 <input type="email" id="email" name="email" value="<?= $formEmail ?>" maxlength="150" autocomplete="email" required>

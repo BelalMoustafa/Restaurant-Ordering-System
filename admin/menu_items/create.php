@@ -1,15 +1,15 @@
 <?php
 define('APP_RUNNING', true);
-$pageTitle = 'Add Menu Item';
-require_once __DIR__ . '/../../includes/header.php';
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once __DIR__ . '/../../includes/auth.php';
 require_once __DIR__ . '/../../config/db.php';
 
 requireLogin('../../auth/login.php');
 requireAdmin('../../user/dashboard.php');
-
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
 
 define('MAX_IMAGE_SIZE',    2 * 1024 * 1024);
 define('ALLOWED_MIME_TYPES', ['image/jpeg', 'image/png']);
@@ -24,11 +24,7 @@ $formCategory    = '';
 $formAvailable   = true;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
-        setFlashMessage('danger', 'Invalid request token. Please try again.');
-        header('Location: create.php');
-        exit;
-    }
+    requireValidCsrf('create.php');
 
     $rawName        = trim($_POST['name']        ?? '');
     $rawDescription = trim($_POST['description'] ?? '');
@@ -119,6 +115,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 }
+
+$pageTitle = 'Add Menu Item';
+require_once __DIR__ . '/../../includes/header.php';
 ?>
     <div class="page-header">
         <h2>Add New Menu Item</h2>
@@ -127,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="card">
         <div class="card-title">Item Details</div>
         <form id="menu-item-form" method="POST" action="create.php" enctype="multipart/form-data" novalidate>
-            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrfToken(), ENT_QUOTES, 'UTF-8') ?>">
             <div class="form-group">
                 <label for="name">Item Name <span class="text-danger">*</span></label>
                 <input type="text" id="name" name="name" value="<?= $formName ?>" maxlength="150" required autocomplete="off">
@@ -139,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div class="form-group">
                 <label for="description">Description <span class="text-muted">(optional)</span></label>
-                <textarea id="description" name="description" rows="3" placeholder="Describe the dish — ingredients, preparation style, etc."><?= $formDescription ?></textarea>
+                <textarea id="description" name="description" rows="3" placeholder="Describe the dish &mdash; ingredients, preparation style, etc."><?= $formDescription ?></textarea>
             </div>
             <div class="d-flex gap-3" style="flex-wrap:wrap;">
                 <div class="form-group" style="flex:1;min-width:180px;">
@@ -169,7 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <span class="form-hint">Uncheck to hide this item from the public menu without deleting it.</span>
             </div>
             <div class="form-group">
-                <label for="image">Item Image <span class="text-muted">(optional — JPG or PNG, max 2MB)</span></label>
+                <label for="image">Item Image <span class="text-muted">(optional &mdash; JPG or PNG, max 2MB)</span></label>
                 <input type="file" id="image" name="image" accept=".jpg,.jpeg,.png,image/jpeg,image/png">
                 <?php if (!empty($errors['image'])): ?>
                     <span id="image-error" class="form-error" role="alert"><?= htmlspecialchars($errors['image'], ENT_QUOTES, 'UTF-8') ?></span>

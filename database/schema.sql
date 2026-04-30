@@ -54,7 +54,7 @@ CREATE TABLE orders (
         ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_orders_menu_item
         FOREIGN KEY (menu_item_id) REFERENCES menu_items (id)
-        ON DELETE CASCADE ON UPDATE CASCADE
+        ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci;

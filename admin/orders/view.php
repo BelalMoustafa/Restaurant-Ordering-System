@@ -1,19 +1,22 @@
 <?php
 define('APP_RUNNING', true);
-$pageTitle = 'Order Details';
-require_once __DIR__ . '/../../includes/header.php';
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once __DIR__ . '/../../includes/auth.php';
 require_once __DIR__ . '/../../config/db.php';
 
 requireLogin('../../auth/login.php');
 requireAdmin('../../user/dashboard.php');
 
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
+$validStatuses = ['pending', 'confirmed', 'cancelled'];
 $orderId = 0;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $orderId = (int) ($_POST['order_id'] ?? 0);
+    requireValidCsrf($orderId > 0 ? 'view.php?id=' . $orderId : 'index.php');
 } else {
     $orderId = (int) ($_GET['id'] ?? 0);
 }
@@ -49,15 +52,7 @@ if (!$order) {
     exit;
 }
 
-$validStatuses = ['pending', 'confirmed', 'cancelled'];
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
-        setFlashMessage('danger', 'Invalid request token. Please try again.');
-        header('Location: view.php?id=' . $orderId);
-        exit;
-    }
-
     $newStatus = trim($_POST['status'] ?? '');
     if (!in_array($newStatus, $validStatuses, true)) {
         setFlashMessage('danger', 'Invalid status value. Please select a valid status.');
@@ -81,6 +76,9 @@ function statusBadgeClass(string $status): string
         default     => 'badge-pending',
     };
 }
+
+$pageTitle = 'Order Details';
+require_once __DIR__ . '/../../includes/header.php';
 ?>
     <div class="page-header">
         <h1>Order #<?= (int) $order['id'] ?></h1>
@@ -153,7 +151,7 @@ function statusBadgeClass(string $status): string
         <div class="card-title">Update Order Status</div>
         <form method="POST" action="view.php?id=<?= (int) $order['id'] ?>">
             <input type="hidden" name="order_id" value="<?= (int) $order['id'] ?>">
-            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrfToken(), ENT_QUOTES, 'UTF-8') ?>">
             <div class="form-group" style="max-width:280px;">
                 <label for="status">New Status</label>
                 <select id="status" name="status">

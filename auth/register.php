@@ -1,7 +1,11 @@
 <?php
 define('APP_RUNNING', true);
-$pageTitle = 'Create Account';
-require_once __DIR__ . '/../includes/header.php';
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../config/db.php';
 
 requireGuest();
@@ -11,6 +15,8 @@ $formName  = '';
 $formEmail = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireValidCsrf('register.php');
+
     $rawName            = trim($_POST['name']             ?? '');
     $rawEmail           = trim($_POST['email']            ?? '');
     $rawPassword        = $_POST['password']              ?? '';
@@ -70,11 +76,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 }
+
+$pageTitle = 'Create Account';
+require_once __DIR__ . '/../includes/header.php';
 ?>
     <div class="form-card">
         <h1>Create Account</h1>
         <p class="form-subtitle">Join us to browse the menu and place orders.</p>
         <form id="register-form" method="POST" action="register.php" novalidate>
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrfToken(), ENT_QUOTES, 'UTF-8') ?>">
             <div class="form-group">
                 <label for="name">Full Name</label>
                 <input type="text" id="name" name="name" value="<?= $formName ?>" maxlength="100" autocomplete="name" required>

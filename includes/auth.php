@@ -30,6 +30,16 @@ function requireAdmin(string $redirectTo = '../user/dashboard.php'): void
     }
 }
 
+function requireUser(string $redirectTo = '../auth/login.php'): void
+{
+    requireLogin($redirectTo);
+
+    if (isAdmin()) {
+        header('Location: ../admin/dashboard.php');
+        exit;
+    }
+}
+
 function requireGuest(): void
 {
     if (isLoggedIn()) {
@@ -38,6 +48,30 @@ function requireGuest(): void
         } else {
             header('Location: ../user/dashboard.php');
         }
+        exit;
+    }
+}
+
+function csrfToken(): string
+{
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+
+    return $_SESSION['csrf_token'];
+}
+
+function requireValidCsrf(string $redirectTo): void
+{
+    if (
+        $_SERVER['REQUEST_METHOD'] === 'POST'
+        && (
+            empty($_POST['csrf_token'])
+            || !hash_equals(csrfToken(), $_POST['csrf_token'])
+        )
+    ) {
+        setFlashMessage('danger', 'Invalid request token. Please try again.');
+        header('Location: ' . $redirectTo);
         exit;
     }
 }

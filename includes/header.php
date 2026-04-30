@@ -43,7 +43,8 @@ $_pageTitle = isset($pageTitle) ? htmlspecialchars($pageTitle) . ' — The Resta
             <ul class="navbar-nav">
                 <?php if (!isLoggedIn()): ?>
                     <li>
-                        <a href="<?= htmlspecialchars($basePath) ?>index.php<?= navActive('index.php') ?>">
+                        <a href="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>index.php"
+                           class="<?= trim(navActive('index.php')) ?>">
                             Menu
                         </a>
                     </li>

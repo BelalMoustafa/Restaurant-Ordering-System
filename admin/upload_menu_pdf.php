@@ -1,7 +1,11 @@
 <?php
 define('APP_RUNNING', true);
-$pageTitle = 'Upload PDF Menu';
-require_once __DIR__ . '/../includes/header.php';
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../config/db.php';
 
 requireLogin();
@@ -15,6 +19,8 @@ define('PDF_FULL_PATH',  PDF_UPLOAD_DIR . PDF_FIXED_NAME);
 $pdfError = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireValidCsrf('upload_menu_pdf.php');
+
     $fileError = $_FILES['menu_pdf']['error'] ?? UPLOAD_ERR_NO_FILE;
 
     if ($fileError === UPLOAD_ERR_NO_FILE) {
@@ -61,6 +67,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $pdfExists       = file_exists(PDF_FULL_PATH);
 $pdfLastModified = $pdfExists ? date('d M Y, H:i', filemtime(PDF_FULL_PATH)) : null;
+
+$pageTitle = 'Upload PDF Menu';
+require_once __DIR__ . '/../includes/header.php';
 ?>
     <div class="page-header">
         <h1>Upload PDF Menu</h1>
@@ -83,7 +92,7 @@ $pdfLastModified = $pdfExists ? date('d M Y, H:i', filemtime(PDF_FULL_PATH)) : n
             <span class="detail-label">Filename</span>
             <span class="detail-value">
                 <code><?= htmlspecialchars(PDF_FIXED_NAME, ENT_QUOTES, 'UTF-8') ?></code>
-                (fixed — always overwritten on upload)
+                (fixed &mdash; always overwritten on upload)
             </span>
         </div>
     </div>
@@ -100,6 +109,7 @@ $pdfLastModified = $pdfExists ? date('d M Y, H:i', filemtime(PDF_FULL_PATH)) : n
             </div>
         <?php endif; ?>
         <form id="pdf-upload-form" method="POST" action="upload_menu_pdf.php" enctype="multipart/form-data" novalidate>
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrfToken(), ENT_QUOTES, 'UTF-8') ?>">
             <div class="form-group">
                 <label for="menu_pdf">Select PDF File <span class="text-danger">*</span></label>
                 <input type="file" id="menu_pdf" name="menu_pdf" accept=".pdf,application/pdf" required>

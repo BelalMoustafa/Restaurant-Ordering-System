@@ -43,6 +43,19 @@ if (!$item) {
     exit;
 }
 
+$stmtCount = $conn->prepare('SELECT COUNT(*) FROM orders WHERE menu_item_id = ?');
+$stmtCount->bind_param('i', $itemId);
+$stmtCount->execute();
+$stmtCount->bind_result($orderCount);
+$stmtCount->fetch();
+$stmtCount->close();
+
+if ((int) $orderCount > 0) {
+    setFlashMessage('danger', 'This item has existing orders. Mark it unavailable instead of deleting it.');
+    header('Location: index.php');
+    exit;
+}
+
 $stmtDelete = $conn->prepare('DELETE FROM menu_items WHERE id = ?');
 $stmtDelete->bind_param('i', $itemId);
 $stmtDelete->execute();
