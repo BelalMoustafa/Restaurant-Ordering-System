@@ -1,0 +1,17 @@
+Options -Indexes
+
+<FilesMatch "\.(php|php3|php4|php5|php7|phtml|phar|phps|shtml|cgi|pl)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "\.(jpg|jpeg|png|gif|webp|pdf)$">
+    Order Deny,Allow
+    Allow from all
+</FilesMatch>
+
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+
+Options -ExecCGI

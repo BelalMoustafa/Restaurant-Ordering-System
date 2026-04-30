@@ -1,0 +1,22 @@
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^config(/.*)?$   - [F,L]
+    RewriteRule ^includes(/.*)?$ - [F,L]
+    RewriteRule ^database(/.*)?$ - [F,L]
+    RewriteRule ^docs(/.*)?$     - [F,L]
+</IfModule>
+
+<FilesMatch "\.(sql|log|env|md|json|lock|bak|swp|gitignore|gitkeep)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "^\.(?!htaccess)">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+AddDefaultCharset UTF-8
+ServerSignature Off
