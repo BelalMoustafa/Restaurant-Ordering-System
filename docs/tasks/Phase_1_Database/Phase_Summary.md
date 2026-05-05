@@ -1,39 +1,56 @@
-# Phase 1 — Database Foundation
+# Phase 1 - Database Foundation
 
 ## Overall Goal
-Establish the entire data layer of the Restaurant Ordering System. This phase produces the SQL schema that every other phase depends on. No application code can be written until this phase is complete and verified.
+
+Establish the entire data layer of the Restaurant Ordering System.
+
+This phase produces the SQL schema that every other phase depends on. No application feature can work correctly until the database tables, relationships, and seed data are complete.
 
 ---
 
 ## Tasks in This Phase
 
-| Task # | Task Name         | Assigned Developer | Status  |
-|--------|-------------------|--------------------|---------|
-| Task 1 | SQL Schema        | Hamza              | Pending |
+| Task # | Task Name | Assigned Developer | Status |
+|--------|-----------|--------------------|--------|
+| Task 1 | SQL Schema | Habiba | Completed |
 
 ---
 
 ## Developer Assignment
 
-| Developer         | Role                        | Responsibility                                      |
-|-------------------|-----------------------------|-----------------------------------------------------|
-| **Hamza**         | Developer                   | Write and execute the full SQL schema (Task 1)      |
-| **Belal Moustafa**| Team Leader & Code Reviewer | Review and approve the SQL schema before Phase 2 begins |
+| Developer | Role | Responsibility |
+|-----------|------|----------------|
+| **Habiba** | Developer | Write and execute the full SQL schema for Task 1. |
+| **Belal Moustafa** | Team Leader & Code Reviewer | Review and approve the SQL schema before later phases depend on it. |
 
-> **Note:** Phase 1 contains a single foundational task. It is assigned solely to Hamza given its critical, singular nature. All other developers are unblocked and may study the schema in preparation for their own tasks.
+---
+
+## Assignment Update
+
+The final roster assigns Task 1 to **Habiba**.
+
+This reflects the corrected task swap between Hamza and Habiba:
+
+- Habiba owns Task 1: SQL Schema.
+- Hamza owns Task 3: Global CSS/JS Assets.
 
 ---
 
 ## Reviewer
 
-**Belal Moustafa** is the designated reviewer for ALL tasks in this phase.  
-No task output moves to the next phase without Belal's explicit approval.
+**Belal Moustafa** is the designated reviewer for all tasks in this phase.
+
+No task output moves to the next phase without Belal's approval.
 
 ---
 
 ## Phase Completion Criteria
-- [ ] `restaurant_db` database created in MySQL
-- [ ] `users` table created with all required columns and constraints
-- [ ] `menu_items` table created with all required columns and constraints
-- [ ] `orders` table created with correct foreign keys referencing `users` and `menu_items`
-- [ ] Schema reviewed and approved by Belal Moustafa
+
+- [x] `restaurant_db` database created in MySQL.
+- [x] `users` table created with all required columns and constraints.
+- [x] `menu_items` table created with all required columns and constraints.
+- [x] `orders` table created with correct foreign keys.
+- [x] Only 3 core tables exist.
+- [x] Password storage supports `password_hash()`.
+- [x] `orders.menu_item_id` uses `ON DELETE RESTRICT`.
+- [x] Schema reviewed and approved by Belal Moustafa.

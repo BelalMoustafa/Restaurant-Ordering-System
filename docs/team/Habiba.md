@@ -4,597 +4,393 @@
 
 Habiba was responsible for:
 
-- Task 3: Global Assets, CSS and JavaScript.
-- Task 12: Menu Items Delete.
+- Task 1: SQL Schema.
+- Task 10: Menu Items Create with Image Upload.
 
-These tasks cover both user interface quality and backend safety. Task 3 gives the system its consistent monochrome design and client-side behaviors. Task 12 implements secure deletion of menu items while preserving order history.
+These tasks are foundational because Task 1 creates the database structure used by the full system, and Task 10 creates the admin feature that inserts menu items into the `menu_items` table.
 
-## 2. Task 3: Global Assets, CSS and JavaScript
-
-## 2.1 Task Objective
-
-The objective of Task 3 was to create the global frontend foundation.
-
-The task required:
-
-- A complete monochrome CSS design system.
-- Clean layout styles.
-- Form styling.
-- Table styling.
-- Button styling.
-- Menu card styling.
-- Responsive behavior.
-- JavaScript helpers for validation and UI behavior.
-
-Files responsible:
-
-```text
-assets/css/style.css
-assets/js/main.js
-```
-
-## 2.2 CSS Architecture Deep-Dive
-
-### Reset and Base Styles
-
-The stylesheet begins with a reset:
-
-```css
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-```
-
-Explanation:
-
-- Removes default browser margin and padding.
-- Makes layout easier to control.
-- `box-sizing: border-box` makes widths include padding and border.
-
-Why this matters:
-
-- Different browsers apply different default styles.
-- Resetting creates a predictable base for the whole project.
-
-### HTML and Body
-
-```css
-html {
-    font-size: 16px;
-    scroll-behavior: smooth;
-}
-
-body {
-    font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
-    font-size: 1rem;
-    line-height: 1.6;
-    background-color: #ffffff;
-    color: #000000;
-}
-```
-
-Explanation:
-
-- Sets readable base font size.
-- Uses smooth scrolling for anchor links.
-- Uses black text on white background.
-- Applies the required monochrome theme.
-
-Defense point:
-
-- The UI follows the project rule: black, white, and gray tones only.
-
-### Typography
-
-Headings use Georgia:
-
-```css
-h1,
-h2,
-h3,
-h4 {
-    font-family: 'Georgia', 'Times New Roman', Times, serif;
-    font-weight: 700;
-}
-```
-
-Explanation:
-
-- Serif headings give the restaurant brand a classic feel.
-- Body text remains clean with sans-serif fonts.
-
-Why this is a design decision:
-
-- It creates hierarchy without using bright colors.
-- It fits the monochrome requirement while still feeling styled.
-
-### Layout Containers
-
-```css
-.container {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 0 20px;
-    width: 100%;
-}
-```
-
-Explanation:
-
-- Keeps content centered.
-- Prevents text from stretching too wide.
-- Provides horizontal spacing on small screens.
-
-### Navigation
-
-The navbar uses black background and white text:
-
-```css
-.navbar {
-    background-color: #000000;
-    color: #ffffff;
-}
-```
-
-Explanation:
-
-- Strong contrast.
-- Clear role-based navigation.
-- Matches monochrome design.
-
-The `.active` link uses underline styling:
-
-```css
-.navbar-nav a.active {
-    border-bottom-color: #ffffff;
-    font-weight: 600;
-}
-```
-
-Why this matters:
-
-- Users can understand which section they are in without extra colors.
-
-### Buttons
-
-Buttons are based on one `.btn` class, then variants:
-
-- `.btn-primary`
-- `.btn-secondary`
-- `.btn-danger`
-- `.btn-sm`
-
-Primary buttons:
-
-```css
-.btn-primary {
-    background-color: #000000;
-    color: #ffffff;
-}
-```
-
-Explanation:
-
-- Primary action is black background with white text.
-- Hover inverts the colors.
-
-Why no bright danger color:
-
-- The strict project rule requires monochrome UI.
-- Danger is shown using stronger border/font weight instead of red.
-
-### Forms
-
-Form fields share one style:
-
-```css
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-select,
-textarea {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #000000;
-}
-```
-
-Explanation:
-
-- All inputs look consistent.
-- Borders are black.
-- Focus state adds stronger border and subtle shadow.
-
-Error messages:
-
-```css
-.form-error {
-    color: #000000;
-    font-weight: 700;
-    border-left: 3px solid #000000;
-}
-```
-
-Why this works:
-
-- Errors are visible without using red.
-- The left border creates a clear visual signal.
-
-### Tables
-
-Tables are used heavily in admin pages.
-
-Key design:
-
-- Black header row.
-- White text in headers.
-- Light gray alternate rows.
-- Horizontal overflow wrapper for small screens.
-
-Purpose:
-
-- Admin pages are data-heavy.
-- Tables need to be scannable and clean.
-
-### Cards
-
-Cards are used for:
-
-- Dashboard panels.
-- Forms.
-- Order details.
-- Menu item display.
-
-Design:
-
-- Border only.
-- White background.
-- No flashy colors.
-
-### Menu Cards
-
-Menu cards show:
-
-- Image.
-- Category.
-- Name.
-- Description.
-- Price.
-- Order action.
-
-Images use:
-
-```css
-filter: grayscale(100%);
-```
-
-Explanation:
-
-- Even uploaded color images are displayed in monochrome style.
-- This enforces visual consistency.
-
-### Alerts and Badges
-
-Alerts use monochrome borders and backgrounds.
-
-Badges show status:
-
-- Pending: light gray background.
-- Confirmed: black background.
-- Cancelled: white with line-through.
-
-Why this matters:
-
-- Status is visually clear without violating monochrome rules.
-
-### Responsive Design
-
-Media query:
-
-```css
-@media (max-width: 640px) {
-    ...
-}
-```
-
-Responsibilities:
-
-- Stack navbar content.
-- Reduce hero heading size.
-- Make menu grid one column.
-- Make action buttons full width where needed.
-
-Defense point:
-
-- The project is usable on smaller screens, not only desktop.
-
-## 2.3 JavaScript Deep-Dive
-
-### Strict Mode
-
-```javascript
-'use strict';
-```
-
-Explanation:
-
-- Enables stricter JavaScript parsing.
-- Helps catch common mistakes.
-
-### Required Field Validation
-
-```javascript
-function validateRequired(fieldId, errorId) {
-    const field = document.getElementById(fieldId);
-    const error = document.getElementById(errorId);
-    if (!field || !error) return true;
-    const value = field.value.trim();
-    if (value === '') {
-        error.textContent = 'This field is required.';
-        field.style.borderColor = '#000000';
-        field.style.borderWidth = '2px';
-        return false;
-    }
-    error.textContent = '';
-    field.style.borderColor = '';
-    field.style.borderWidth = '';
-    return true;
-}
-```
-
-Explanation:
-
-- Finds the field and error span by ID.
-- If missing, it returns true so pages without that field do not break.
-- Trims value and checks empty state.
-- Shows error and strengthens border.
-- Clears error when valid.
-
-Why defensive DOM checks:
-
-- The same JS file runs on every page.
-- Not every page has every form.
-
-### Email Validation
-
-```javascript
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-```
-
-Explanation:
-
-- Checks simple email format.
-- Prevents obvious invalid emails before submitting.
-
-Defense point:
-
-- JavaScript validation improves UX, but PHP still validates server-side.
-
-### File Validation
-
-Functions:
-
-- `validateFileType()`
-- `validateFileSize()`
-
-Purpose:
-
-- Warn user before invalid file reaches server.
-- Reduce unnecessary upload attempts.
-
-Important:
-
-- Server-side PHP remains the real security validation.
-
-### DOMContentLoaded
-
-```javascript
-document.addEventListener('DOMContentLoaded', function () {
-    ...
-});
-```
-
-Explanation:
-
-- Runs JS after the HTML is ready.
-- Prevents querying elements before they exist.
-
-### Register Form Validation
-
-The script checks:
-
-- Name required.
-- Email valid.
-- Password required.
-- Password minimum length.
-- Confirm password matches.
-
-Why:
-
-- Improves user experience.
-- Reduces avoidable server submissions.
-
-### Login Form Validation
-
-The script checks:
-
-- Email valid.
-- Password required.
-
-### Menu Item Form Validation
-
-The script checks:
-
-- Name required.
-- Price required.
-- Category required.
-- Image type and size if image selected.
-
-Important:
-
-- It supports both create and edit forms because both use `menu-item-form`.
-
-### PDF Upload Validation
-
-The script checks:
-
-- A PDF is selected.
-- Extension is `pdf`.
-- Size is under 5MB.
-
-### Order Form Validation
-
-The script checks:
-
-- Quantity is between 1 and 20.
-
-### Flash Message Auto-Dismiss
-
-Alerts disappear after 4 seconds.
-
-Purpose:
-
-- Keeps the interface clean.
-- Gives feedback without requiring manual close buttons.
-
-### Delete Confirmation
-
-Danger buttons trigger a browser confirm dialog.
-
-Purpose:
-
-- Prevent accidental deletion.
-
-Important:
-
-- This is only a UX feature.
-- The server still validates POST, CSRF, admin role, and order dependencies.
-
-### Price Preview
-
-The order form reads:
-
-- Selected item `data-price`.
-- Quantity input.
-
-Then shows:
-
-```text
-Estimated Total: $...
-```
-
-Important:
-
-- This is only a preview.
-- Final total is calculated server-side from the database.
-
-### Image Preview
-
-When admin selects an image file, JavaScript displays a preview.
-
-Purpose:
-
-- Helps admin confirm they chose the correct image.
-
-## 2.4 Design Decisions for Task 3
-
-### Why one global CSS file?
-
-The project is small. One file is simpler to maintain and avoids complex build tools.
-
-### Why one global JS file?
-
-The project does not require bundlers or modules. One JS file is easy to include in the shared footer.
-
-### Why monochrome?
-
-The project specification requires a black-and-white design with clean spacing.
-
-### Why JavaScript is not trusted for security?
-
-Browser code can be disabled or modified. PHP validation is the final authority.
-
-## 2.5 Alternatives for Task 3
-
-### Alternative: Bootstrap
-
-Bootstrap could provide ready-made components.
-
-Why not chosen:
-
-- It would add external framework dependency.
-- It may conflict with strict monochrome custom design.
-
-### Alternative: Tailwind CSS
-
-Tailwind could provide utility classes.
-
-Why not chosen:
-
-- It requires build/config setup.
-- The project requirement favors simple Core PHP and local files.
-
-### Alternative: Multiple JS Files
-
-Separate scripts per page could reduce unused JS.
-
-Why not chosen:
-
-- One small global file is easier for the team to explain.
-- The script checks whether elements exist before acting.
-
-## 2.6 Dependencies for Task 3
-
-Task 3 depends on Task 2:
-
-- Asset folders must exist.
-
-Task 3 supports Task 4:
-
-- `header.php` links to `assets/css/style.css`.
-- `footer.php` loads `assets/js/main.js`.
-
-Task 3 supports all UI tasks:
-
-- Admin pages.
-- Auth pages.
-- User pages.
-- Landing page.
+Habiba's work connects the database layer with one of the most important admin workflows: creating new dishes that users can later browse and order.
 
 ---
 
-## 3. Task 12: Menu Items Delete
+## 2. Task 1: SQL Schema
+
+## 2.1 Task Objective
+
+The objective of Task 1 was to create the complete MySQL database foundation for the Restaurant Ordering System.
+
+The schema had to satisfy strict project requirements:
+
+- Database name: `restaurant_db`.
+- Exactly 3 core tables:
+  - `users`
+  - `menu_items`
+  - `orders`
+- Correct primary keys.
+- Correct foreign keys.
+- Correct role model.
+- Correct order relationship model.
+- Password column large enough for hashes.
+- Remember-me token storage.
+- Local reset-friendly SQL script.
+
+Main file:
+
+```text
+database/schema.sql
+```
+
+## 2.2 SQL Script Deep-Dive
+
+### Database Reset
+
+```sql
+DROP DATABASE IF EXISTS restaurant_db;
+CREATE DATABASE restaurant_db
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+USE restaurant_db;
+```
+
+Explanation:
+
+- `DROP DATABASE IF EXISTS` allows the database to be recreated cleanly.
+- `CREATE DATABASE restaurant_db` creates the required database.
+- `CHARACTER SET utf8mb4` supports full Unicode text.
+- `COLLATE utf8mb4_unicode_ci` provides Unicode-aware comparison.
+- `USE restaurant_db` makes following SQL statements run inside this database.
+
+Defense point:
+
+- This is helpful for a university demo because the team can reset the database quickly before testing.
+
+### Users Table
+
+```sql
+CREATE TABLE users (
+    id             INT                  NOT NULL AUTO_INCREMENT,
+    name           VARCHAR(100)         NOT NULL,
+    email          VARCHAR(150)         NOT NULL,
+    password       VARCHAR(255)         NOT NULL,
+    role           ENUM('admin','user') NOT NULL DEFAULT 'user',
+    remember_token VARCHAR(64)          NULL,
+    created_at     TIMESTAMP            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_users_email (email),
+    UNIQUE KEY uq_users_remember_token (remember_token)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
+```
+
+Explanation:
+
+- `id` uniquely identifies every account.
+- `name` stores the display name.
+- `email` is used for login.
+- `password` stores a hashed password.
+- `role` separates admin accounts from normal user accounts.
+- `remember_token` stores the hashed remember-me token.
+- `created_at` stores account creation time automatically.
+
+Constraint explanation:
+
+- `PRIMARY KEY (id)` makes every row unique.
+- `UNIQUE KEY uq_users_email (email)` prevents duplicate accounts.
+- `UNIQUE KEY uq_users_remember_token (remember_token)` prevents token collisions.
+
+Why `VARCHAR(255)` for passwords:
+
+- `password_hash()` can generate long hashes.
+- `VARCHAR(255)` supports bcrypt and future algorithms used by `PASSWORD_DEFAULT`.
+
+Why `remember_token` is `VARCHAR(64)`:
+
+- The application stores a SHA-256 hash of the remember-me token.
+- SHA-256 hex output is 64 characters.
+- The raw cookie token is not stored in the database.
+
+Why `role` is an ENUM:
+
+- Only `admin` and `user` are valid roles.
+- This prevents invalid role values from being stored.
+
+### Menu Items Table
+
+```sql
+CREATE TABLE menu_items (
+    id           INT           NOT NULL AUTO_INCREMENT,
+    name         VARCHAR(150)  NOT NULL,
+    description  TEXT          NULL,
+    price        DECIMAL(10,2) NOT NULL,
+    category     VARCHAR(100)  NOT NULL,
+    image_path   VARCHAR(255)  NULL,
+    is_available TINYINT(1)    NOT NULL DEFAULT 1,
+    created_at   TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_menu_items_category     (category),
+    KEY idx_menu_items_is_available (is_available)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
+```
+
+Explanation:
+
+- `id` uniquely identifies every menu item.
+- `name` stores the dish name.
+- `description` stores optional details.
+- `price` stores the menu item price.
+- `category` stores grouping text such as starters or desserts.
+- `image_path` stores the uploaded image path.
+- `is_available` controls whether users can see and order the item.
+- `created_at` records when the item was created.
+
+Why `DECIMAL(10,2)` for price:
+
+- Money-like values should be exact.
+- Floating point storage can introduce precision issues.
+- `DECIMAL(10,2)` supports values like `0.00`, `12.50`, and `199.99`.
+
+Why zero price is allowed:
+
+- The system may include complimentary items.
+- The application validates only against negative prices.
+
+Why `is_available` exists:
+
+- Admins can hide items without deleting them.
+- This protects historical order records.
+
+### Orders Table
+
+```sql
+CREATE TABLE orders (
+    id           INT                                     NOT NULL AUTO_INCREMENT,
+    user_id      INT                                     NOT NULL,
+    menu_item_id INT                                     NOT NULL,
+    quantity     INT                                     NOT NULL DEFAULT 1,
+    total_price  DECIMAL(10,2)                           NOT NULL,
+    status       ENUM('pending','confirmed','cancelled') NOT NULL DEFAULT 'pending',
+    notes        TEXT                                    NULL,
+    created_at   TIMESTAMP                               NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_orders_user_id      (user_id),
+    KEY idx_orders_menu_item_id (menu_item_id),
+    KEY idx_orders_status       (status),
+    CONSTRAINT fk_orders_user
+        FOREIGN KEY (user_id) REFERENCES users (id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_orders_menu_item
+        FOREIGN KEY (menu_item_id) REFERENCES menu_items (id)
+        ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
+```
+
+Explanation:
+
+- `id` uniquely identifies each order.
+- `user_id` links the order to the customer.
+- `menu_item_id` links the order to the ordered menu item.
+- `quantity` stores how many units were ordered.
+- `total_price` stores the calculated total at order time.
+- `status` tracks admin processing.
+- `notes` stores optional customer instructions.
+- `created_at` stores order creation time.
+
+Why `total_price` is stored:
+
+- Menu item prices can change later.
+- Order history must preserve what the customer actually ordered at the time.
+
+Why `status` is an ENUM:
+
+- Only valid statuses are allowed:
+  - `pending`
+  - `confirmed`
+  - `cancelled`
+
+Why `ON DELETE CASCADE` for users:
+
+- If a user is removed, their dependent orders can be removed.
+- User deletion is not a public feature, but the database relationship remains consistent.
+
+Why `ON DELETE RESTRICT` for menu items:
+
+- Menu items with orders should not be deleted.
+- Deleting them would damage order history.
+- The application delete handler also checks this before deletion.
+
+Defense point:
+
+- The system enforces important business rules in both PHP and SQL.
+
+### Seed Accounts
+
+The schema includes default test accounts.
+
+Purpose:
+
+- The team can test the application immediately after importing the schema.
+- Admin and user flows can both be demonstrated during defense.
+
+Important rule:
+
+- Seed passwords are stored as hashes, not plain text.
+
+### Seed Menu Items
+
+The schema also inserts sample menu items.
+
+Purpose:
+
+- The landing page and menu page are not empty after setup.
+- Admin and user flows can be tested immediately.
+- The system can demonstrate available and unavailable items.
+
+## 2.3 Design Decisions for Task 1
+
+### Why exactly 3 tables?
+
+The project specification requires exactly 3 core tables:
+
+- `users`
+- `menu_items`
+- `orders`
+
+The schema avoids extra tables such as:
+
+- `categories`
+- `order_items`
+- `settings`
+- `menu_pdfs`
+
+### Why one `users` table for admins and users?
+
+Admins and users both log in with email and password.
+
+A single table with a `role` column is better for this project because:
+
+- One login system supports both roles.
+- Authorization is based on the `role` value.
+- Duplicate authentication logic is avoided.
+
+### Why no separate `categories` table?
+
+Category management is not a required CRUD feature.
+
+Using a `category` text column:
+
+- Keeps the schema within 3 tables.
+- Makes item creation simple.
+- Still supports grouping menu items.
+
+### Why no `order_items` table?
+
+The project uses one menu item per order row.
+
+An `order_items` table would be useful for a shopping cart, but:
+
+- It would add more schema complexity.
+- It could violate the 3-table requirement.
+- The current project does not require multi-item carts.
+
+### Why InnoDB?
+
+InnoDB supports:
+
+- Foreign keys.
+- Referential integrity.
+- Cascading and restricted relationships.
+
+These are required for a proper relational schema.
+
+## 2.4 Alternatives for Task 1
+
+### Alternative: More Normalized Schema
+
+Possible extra tables:
+
+- `categories`
+- `order_items`
+- `menu_uploads`
+- `settings`
+
+Why not chosen:
+
+- The project requirement limits the schema to 3 tables.
+- Extra tables would make the project harder to defend against the specification.
+
+### Alternative: Store Prices as FLOAT
+
+Why not chosen:
+
+- Floating point numbers can create precision issues.
+- `DECIMAL(10,2)` is better for money-like values.
+
+### Alternative: Separate Admin Table
+
+Why not chosen:
+
+- Admins and users share the same authentication fields.
+- A role column is simpler and avoids duplicate login logic.
+
+### Alternative: Delete Menu Items with Cascade
+
+Why not chosen:
+
+- Cascade deletion would remove historical order meaning.
+- `ON DELETE RESTRICT` protects records that users and admins may need later.
+
+## 2.5 Dependencies for Task 1
+
+Task 1 has no older dependency because it is the first task.
+
+However, every later task depends on it:
+
+- Task 2 needs the database name for connection.
+- Task 5 and Task 6 need the `users` table.
+- Task 8 needs summary data from the tables.
+- Task 10, Task 11, and Task 12 need `menu_items`.
+- Task 14 needs all three tables.
+- Task 16 and Task 17 need `orders`.
+
+Defense point:
+
+- Task 1 is the foundation of the entire project.
+
+---
+
+## 3. Task 10: Menu Items Create With Image Upload
 
 ## 3.1 Task Objective
 
-Task 12 allows admins to delete menu items safely.
+The objective of Task 10 was to let admins create new menu items from a protected admin form.
 
-The feature must:
+The feature had to:
 
 - Be admin-only.
-- Accept POST only.
 - Validate CSRF token.
-- Validate item ID.
-- Fetch item before deletion.
-- Block deletion if existing orders reference the item.
-- Delete the database row if safe.
-- Delete the associated image file if it exists.
-- Redirect with flash messages.
+- Validate item fields.
+- Allow price `0.00`.
+- Reject negative prices.
+- Optionally upload an image.
+- Accept only JPG and PNG images.
+- Enforce a maximum image size.
+- Insert menu item data using MySQLi OO prepared statements.
 
-## 3.2 File Responsible
+Main file:
 
 ```text
-admin/menu_items/delete.php
+admin/menu_items/create.php
 ```
 
-## 3.3 Code Deep-Dive
+## 3.2 Code Deep-Dive
 
-### Bootstrap
+### Application Bootstrap
 
 ```php
 define('APP_RUNNING', true);
@@ -609,12 +405,15 @@ require_once __DIR__ . '/../../config/db.php';
 
 Explanation:
 
-- Starts app context.
-- Starts session.
-- Loads auth helpers.
-- Loads database connection.
+- `APP_RUNNING` marks the file as part of the application.
+- `session_start()` makes session values available.
+- `auth.php` provides login, admin, flash, and CSRF helpers.
+- `db.php` provides the MySQLi connection.
 
-This file outputs no HTML. It is a pure action handler.
+Why this is before HTML:
+
+- The page may need to redirect.
+- Redirects must happen before output.
 
 ### Authorization
 
@@ -625,310 +424,601 @@ requireAdmin('../../user/dashboard.php');
 
 Explanation:
 
-- Guests cannot delete items.
-- Users cannot delete items.
-- Only admins can continue.
-
-### POST-Only Check
-
-```php
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: index.php');
-    exit;
-}
-```
-
-Explanation:
-
-- Delete must not happen through GET links.
-- Direct URL access redirects back to list.
-
-Why POST only:
-
-- GET should be safe and not change data.
-- Delete is destructive, so it requires form submission.
-
-### CSRF Validation
-
-```php
-if (!isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
-    setFlashMessage('danger', 'Invalid request token. Please try again.');
-    header('Location: index.php');
-    exit;
-}
-```
-
-Explanation:
-
-- Checks session token exists.
-- Compares submitted token with `hash_equals()`.
-- Invalid request is rejected.
-
-Why `hash_equals()`:
-
-- It performs timing-safe comparison.
-- This is a secure standard for comparing tokens.
-
-### Item ID Validation
-
-```php
-$itemId = (int) ($_POST['id'] ?? 0);
-
-if ($itemId <= 0) {
-    setFlashMessage('danger', 'Invalid item ID. No item was deleted.');
-    header('Location: index.php');
-    exit;
-}
-```
-
-Explanation:
-
-- Converts submitted ID to integer.
-- Rejects missing or invalid IDs.
-
-### Fetch Item Before Delete
-
-```php
-$stmtFetch = $conn->prepare('SELECT id, name, image_path FROM menu_items WHERE id = ? LIMIT 1');
-$stmtFetch->bind_param('i', $itemId);
-$stmtFetch->execute();
-$resultFetch = $stmtFetch->get_result();
-$item        = $resultFetch->fetch_assoc();
-$stmtFetch->close();
-```
-
-Explanation:
-
-- Fetches item data safely.
-- Needs item name for message.
-- Needs image path for file deletion.
-
-Why fetch before delete:
-
-- After deletion, image path would no longer be available from the database.
-
-### Missing Item Handling
-
-```php
-if (!$item) {
-    setFlashMessage('danger', 'Item not found. It may have already been deleted.');
-    header('Location: index.php');
-    exit;
-}
-```
-
-Explanation:
-
-- If the item does not exist, deletion stops.
-- Admin gets a clear message.
-
-### Existing Orders Check
-
-```php
-$stmtCount = $conn->prepare('SELECT COUNT(*) FROM orders WHERE menu_item_id = ?');
-$stmtCount->bind_param('i', $itemId);
-$stmtCount->execute();
-$stmtCount->bind_result($orderCount);
-$stmtCount->fetch();
-$stmtCount->close();
-
-if ((int) $orderCount > 0) {
-    setFlashMessage('danger', 'This item has existing orders. Mark it unavailable instead of deleting it.');
-    header('Location: index.php');
-    exit;
-}
-```
-
-Explanation:
-
-- Counts how many orders reference this item.
-- If count is greater than zero, deletion is blocked.
-- Admin is told to mark item unavailable instead.
-
-Why this business rule exists:
-
-- Orders are historical records.
-- Deleting referenced menu items would damage order history.
-- The database also enforces `ON DELETE RESTRICT`.
+- Guests are redirected to login.
+- Regular users are redirected away.
+- Only admins can create menu items.
 
 Defense point:
 
-- This is application-level protection plus database-level referential integrity.
+- Menu creation is a protected admin feature.
 
-### Delete Query
+### Upload Constants
 
 ```php
-$stmtDelete = $conn->prepare('DELETE FROM menu_items WHERE id = ?');
-$stmtDelete->bind_param('i', $itemId);
-$stmtDelete->execute();
+define('MAX_IMAGE_SIZE', 2 * 1024 * 1024);
+define('ALLOWED_MIME_TYPES', ['image/jpeg', 'image/png']);
+define('ALLOWED_EXTENSIONS', ['jpg', 'jpeg', 'png']);
+define('UPLOAD_DIR', __DIR__ . '/../../uploads/images/');
 ```
 
 Explanation:
 
-- Deletes only the selected item.
-- Uses prepared statement.
-- Prevents SQL injection.
+- `MAX_IMAGE_SIZE` limits uploads to 2MB.
+- `ALLOWED_MIME_TYPES` defines accepted real file content types.
+- `ALLOWED_EXTENSIONS` defines accepted filename extensions.
+- `UPLOAD_DIR` defines the image destination folder.
 
-### Affected Rows Check
+Why constants are useful:
+
+- Validation rules are easy to review.
+- Limits and allowed types can be changed in one place.
+
+### Form State Variables
 
 ```php
-if ($stmtDelete->affected_rows === 0) {
-    $stmtDelete->close();
-    setFlashMessage('danger', 'No item was deleted. It may have already been removed.');
-    header('Location: index.php');
-    exit;
+$errors = [];
+$formName = '';
+$formDescription = '';
+$formPrice = '';
+$formCategory = '';
+$formAvailable = true;
+```
+
+Explanation:
+
+- `$errors` stores validation messages.
+- Form variables preserve submitted values after validation failure.
+- New items default to available.
+
+Why preserve values:
+
+- Admins should not retype everything after one validation error.
+
+### POST Detection and CSRF Validation
+
+```php
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireValidCsrf('create.php');
+```
+
+Explanation:
+
+- The form is processed only on POST.
+- CSRF validation runs before file saving or database insertion.
+
+Why CSRF comes early:
+
+- No state-changing action should occur before token validation.
+
+### Reading Form Inputs
+
+```php
+$rawName = trim($_POST['name'] ?? '');
+$rawDescription = trim($_POST['description'] ?? '');
+$rawPrice = trim($_POST['price'] ?? '');
+$rawCategory = trim($_POST['category'] ?? '');
+$rawAvailable = isset($_POST['is_available']) ? 1 : 0;
+```
+
+Explanation:
+
+- Reads submitted form fields.
+- `trim()` removes unnecessary whitespace.
+- Null coalescing avoids undefined index warnings.
+- Checkbox value becomes integer `1` or `0`.
+
+### Escaping Values for Re-display
+
+```php
+$formName = htmlspecialchars($rawName, ENT_QUOTES, 'UTF-8');
+$formDescription = htmlspecialchars($rawDescription, ENT_QUOTES, 'UTF-8');
+$formPrice = htmlspecialchars($rawPrice, ENT_QUOTES, 'UTF-8');
+$formCategory = htmlspecialchars($rawCategory, ENT_QUOTES, 'UTF-8');
+$formAvailable = (bool) $rawAvailable;
+```
+
+Explanation:
+
+- Raw values are kept for validation and database insertion.
+- Escaped values are used when printing back into HTML.
+- `ENT_QUOTES` escapes both single and double quotes.
+- `UTF-8` matches the project encoding.
+
+Defense point:
+
+- This prevents XSS when the form is re-rendered after validation failure.
+
+### Name Validation
+
+```php
+if ($rawName === '') {
+    $errors['name'] = 'Item name is required.';
+} elseif (mb_strlen($rawName) > 150) {
+    $errors['name'] = 'Item name must not exceed 150 characters.';
 }
 ```
 
 Explanation:
 
-- Confirms that a row was actually deleted.
-- Handles race conditions or unexpected database state.
+- Name is required.
+- Maximum length matches the database column.
+- `mb_strlen()` handles multibyte text correctly.
 
-### Image File Cleanup
+### Price Validation
 
 ```php
-if (!empty($item['image_path'])) {
-    $absoluteImagePath = __DIR__ . '/../../' . $item['image_path'];
-    if (file_exists($absoluteImagePath)) {
-        unlink($absoluteImagePath);
+if ($rawPrice === '') {
+    $errors['price'] = 'Price is required.';
+} elseif (!is_numeric($rawPrice)) {
+    $errors['price'] = 'Price must be a valid number.';
+} elseif ((float) $rawPrice < 0) {
+    $errors['price'] = 'Price cannot be negative.';
+}
+```
+
+Explanation:
+
+- Price cannot be empty.
+- Price must be numeric.
+- Price cannot be negative.
+- Price `0` is accepted.
+
+Defense point:
+
+- This satisfies the project rule that zero-price items are valid.
+
+### Category Validation
+
+```php
+if ($rawCategory === '') {
+    $errors['category'] = 'Category is required.';
+} elseif (mb_strlen($rawCategory) > 100) {
+    $errors['category'] = 'Category must not exceed 100 characters.';
+}
+```
+
+Explanation:
+
+- Category is required.
+- Maximum length matches the database column.
+
+### File Upload Detection
+
+```php
+$imagePath = null;
+$fileError = $_FILES['image']['error'] ?? UPLOAD_ERR_NO_FILE;
+```
+
+Explanation:
+
+- Image upload is optional.
+- If no file exists, PHP treats it as `UPLOAD_ERR_NO_FILE`.
+- `$imagePath` stays null unless a valid file is saved.
+
+### Upload Error Handling
+
+```php
+if ($fileError !== UPLOAD_ERR_NO_FILE) {
+    if ($fileError !== UPLOAD_ERR_OK) {
+        $errors['image'] = 'File upload failed. Please try again.';
     }
 }
 ```
 
 Explanation:
 
-- If item had an image path, build absolute file path.
-- Check whether file exists.
-- Delete file from disk.
+- No file is allowed.
+- A failed upload is rejected.
+- A successful upload continues to validation.
 
-Why delete image:
-
-- Prevent orphan files.
-- Keep upload folder clean.
-
-### Success Message
+### File Information
 
 ```php
-$deletedName = htmlspecialchars($item['name'], ENT_QUOTES, 'UTF-8');
-setFlashMessage('success', 'Menu item "' . $deletedName . '" was deleted successfully.');
+$tmpPath = $_FILES['image']['tmp_name'];
+$originalName = $_FILES['image']['name'];
+$fileSize = $_FILES['image']['size'];
+$extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+```
+
+Explanation:
+
+- `$tmpPath` is the temporary uploaded file.
+- `$originalName` is the browser-provided filename.
+- `$fileSize` is used for size validation.
+- `$extension` is normalized for extension validation.
+
+Security note:
+
+- The original filename is not trusted for storage.
+
+### Size Validation
+
+```php
+if ($fileSize > MAX_IMAGE_SIZE) {
+    $errors['image'] = 'Image is too large. Maximum allowed size is 2MB.';
+}
+```
+
+Explanation:
+
+- Rejects images above the allowed size.
+- Protects local storage from large files.
+
+### MIME Type Validation
+
+```php
+$detectedMime = mime_content_type($tmpPath);
+if (!in_array($detectedMime, ALLOWED_MIME_TYPES, true)) {
+    $errors['image'] = 'Invalid file type. Only JPG and PNG images are allowed.';
+}
+```
+
+Explanation:
+
+- Checks the actual content type.
+- Uses strict comparison.
+- Allows only JPEG and PNG.
+
+Why this matters:
+
+- A file extension can be faked.
+- MIME validation is stronger than trusting the filename.
+
+### Extension Validation
+
+```php
+if (!in_array($extension, ALLOWED_EXTENSIONS, true)) {
+    $errors['image'] = 'Invalid file extension. Only .jpg, .jpeg, and .png are allowed.';
+}
+```
+
+Explanation:
+
+- Enforces the visible filename policy.
+- Keeps uploads limited to the expected formats.
+
+### Safe Filename Generation
+
+```php
+$newFilename = uniqid('item_', true) . '.' . $extension;
+$destination = UPLOAD_DIR . $newFilename;
+```
+
+Explanation:
+
+- Generates a unique filename.
+- Keeps the validated extension.
+- Avoids trusting the original filename.
+
+Why not use the original filename:
+
+- It may contain unsafe characters.
+- It may conflict with an existing file.
+- It may reveal user information.
+
+### Moving Uploaded File
+
+```php
+if (!move_uploaded_file($tmpPath, $destination)) {
+    $errors['image'] = 'Failed to save the uploaded image.';
+} else {
+    $imagePath = 'uploads/images/' . $newFilename;
+}
+```
+
+Explanation:
+
+- `move_uploaded_file()` safely moves a PHP upload.
+- The relative path is stored for later display.
+
+Why relative path:
+
+- It works from the project root.
+- It avoids exposing the local filesystem path.
+
+### Database Insert
+
+```php
+$stmtInsert = $conn->prepare(
+    'INSERT INTO menu_items (name, description, price, category, image_path, is_available)
+     VALUES (?, ?, ?, ?, ?, ?)'
+);
+$stmtInsert->bind_param('ssdssi', $rawName, $descValue, $priceValue, $rawCategory, $imageValue, $rawAvailable);
+$stmtInsert->execute();
+$stmtInsert->close();
+```
+
+Explanation:
+
+- Uses MySQLi OO prepared statements.
+- SQL contains placeholders.
+- User values are bound separately.
+- `ssdssi` defines the value types:
+  - `s`: name
+  - `s`: description
+  - `d`: price
+  - `s`: category
+  - `s`: image path
+  - `i`: availability
+
+Defense point:
+
+- This prevents SQL injection because form input is not concatenated into SQL.
+
+### Success Redirect
+
+```php
+setFlashMessage('success', 'Menu item "' . $rawName . '" added successfully.');
 header('Location: index.php');
 exit;
 ```
 
 Explanation:
 
-- Escapes item name before putting it into the message.
-- Redirects back to menu item list.
+- Stores a flash success message.
+- Redirects to the menu items list.
+- Stops execution.
 
-## 3.4 Design Decisions for Task 12
+Why redirect after POST:
 
-### Why no HTML output?
+- Prevents duplicate insertion if the admin refreshes the page.
 
-Delete is an action, not a page. It should process and redirect.
+### CSRF Hidden Input
 
-### Why block deletion when orders exist?
+```php
+<input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrfToken(), ENT_QUOTES, 'UTF-8') ?>">
+```
 
-To preserve order history and satisfy data integrity.
+Explanation:
 
-### Why delete the image file?
+- Adds a CSRF token to the form.
+- Escapes the token before output.
+- Allows `requireValidCsrf()` to verify the POST request.
 
-The database row and image file should remain synchronized.
+## 3.3 Design Decisions for Task 10
 
-### Why use both JS confirm and server checks?
+### Why admin-only?
 
-JavaScript confirm prevents accidents, but server checks enforce real security.
+Only admins should manage the restaurant menu.
 
-## 3.5 Alternatives for Task 12
+If normal users could create items:
 
-### Alternative: Soft Delete
+- The public menu would become untrusted.
+- Prices could be manipulated.
+- The business workflow would break.
 
-Instead of deleting, add `deleted_at` column.
+### Why prepared statements?
+
+Menu item fields come from a form.
+
+Prepared statements:
+
+- Prevent SQL injection.
+- Keep SQL separate from data.
+- Satisfy the MySQLi OO project requirement.
+
+### Why server-side validation?
+
+HTML and JavaScript validation can be bypassed.
+
+PHP validation ensures:
+
+- Empty values are rejected.
+- Negative prices are rejected.
+- File type and size rules are enforced.
+
+### Why allow price zero?
+
+The project supports complimentary items.
+
+The validation rejects:
+
+```text
+price < 0
+```
+
+but accepts:
+
+```text
+price = 0
+```
+
+### Why optional image upload?
+
+Some menu items may not have images.
+
+The UI can display a placeholder when `image_path` is empty.
+
+### Why only JPG and PNG?
+
+JPG and PNG are common image formats.
+
+They are easier and safer to validate than formats such as SVG.
+
+### Why store image path, not image binary?
+
+Storing files on disk and paths in the database is simpler.
+
+Benefits:
+
+- Smaller database.
+- Easier browser rendering.
+- Easier file replacement and cleanup.
+
+## 3.4 Alternatives for Task 10
+
+### Alternative: Use Framework Upload Helpers
+
+Frameworks can simplify uploads.
 
 Why not chosen:
 
-- The schema is restricted.
-- Existing `is_available` already supports hiding items.
+- Frameworks are forbidden.
+- Core PHP is required by the project.
 
-### Alternative: Allow Cascade Delete
-
-Deleting a menu item could delete all related orders.
+### Alternative: Accept SVG or WebP
 
 Why not chosen:
 
-- It causes data loss.
-- It is bad for business history.
+- The requirement is JPG and PNG.
+- SVG can carry script-like content.
+- More formats create more validation complexity.
 
-### Alternative: Delete Through GET Link
+### Alternative: Store Uploaded Images in Database
 
 Why not chosen:
 
-- GET should not change data.
-- Search engines, previews, or accidental clicks could trigger deletion.
+- Makes the database larger.
+- Makes image serving more complicated.
+- File paths are simpler for a local XAMPP/MAMP project.
 
-## 3.6 Dependencies for Task 12
+### Alternative: Trust Browser MIME Type
 
-Task 12 depends on:
+Why not chosen:
 
-- Task 1 for `menu_items` and `orders`.
-- Task 2 for database connection.
-- Task 4 for auth and flash helpers.
-- Task 9 because delete buttons are shown in the menu item list.
-- Task 10 because items must exist before deletion.
+- Browser-provided MIME type can be faked.
+- Server-side `mime_content_type()` is stronger.
 
-Task 12 supports:
+## 3.5 Dependencies for Task 10
 
-- Data cleanup.
-- Admin menu management.
-- Security hardening through POST and CSRF.
+### Depends on Task 1: SQL Schema
+
+Task 10 inserts into:
+
+```text
+menu_items
+```
+
+Important columns:
+
+- `name`
+- `description`
+- `price`
+- `category`
+- `image_path`
+- `is_available`
+
+### Depends on Task 2: Database Connection
+
+Task 10 uses:
+
+```text
+config/db.php
+```
+
+which provides:
+
+```php
+$conn
+```
+
+### Depends on Task 4: Shared Includes
+
+Task 10 uses:
+
+```text
+includes/auth.php
+includes/header.php
+includes/footer.php
+```
+
+for:
+
+- Admin authorization.
+- CSRF protection.
+- Flash messages.
+- Shared layout.
+
+### Depends on Task 6: Login
+
+Admin authorization depends on session values created during login:
+
+```text
+$_SESSION['user_id']
+$_SESSION['role']
+$_SESSION['user_name']
+```
+
+### Supports Task 11 and Task 12
+
+Task 10 creates menu items that can later be:
+
+- Edited in Task 11.
+- Deleted in Task 12.
+
+### Supports Task 15 and Task 16
+
+Created menu items become visible to users when available.
+
+Users can then:
+
+- Browse them in Task 15.
+- Order them in Task 16.
 
 ## 4. Habiba Defense Questions and Answers
 
-### Q1: Why use a monochrome design?
+### Q1: Why did you use exactly three tables?
 
-Because the project specification requires a black-and-white clean UI. The design uses contrast, spacing, typography, and borders instead of flashy colors.
+Because the project specification requires three core tables: `users`, `menu_items`, and `orders`. Extra tables would violate the requirement.
 
-### Q2: Why use JavaScript if PHP validates everything?
+### Q2: Why use `DECIMAL(10,2)` for price?
 
-JavaScript improves user experience by giving immediate feedback, but PHP remains the security authority.
+Because price values should be exact. `DECIMAL(10,2)` is better than floating point storage for money-like values.
 
-### Q3: Why is delete POST only?
+### Q3: Why store `total_price` in orders?
 
-Because delete changes data. GET requests should be safe and should not perform destructive actions.
+Because menu item prices may change later. The order should preserve the total from the time it was placed.
 
-### Q4: Why block deletion when orders exist?
+### Q4: Why restrict deletion of ordered menu items?
 
-Because orders are historical records and must not lose their menu item reference.
+Because order history depends on the menu item remaining valid. `ON DELETE RESTRICT` protects historical data.
 
-### Q5: Why delete the image file after deleting the item?
+### Q5: Why validate image MIME type and extension?
 
-Because otherwise the upload directory would contain unused files not connected to any database row.
+Because extension alone can be faked. MIME validation checks file content, while extension validation enforces the project format rule.
 
-### Q6: Why use grayscale images?
+### Q6: Why use generated filenames?
 
-Uploaded images may be colorful, but the UI must remain monochrome. CSS grayscale keeps visual consistency.
+Generated filenames avoid collisions, unsafe characters, and reliance on user-supplied names.
+
+### Q7: Why allow price zero?
+
+The specification allows complimentary items, so validation rejects negative prices but accepts `0.00`.
+
+### Q8: Why use MySQLi prepared statements?
+
+The project requires Object-Oriented MySQLi, and prepared statements protect against SQL injection.
 
 ## 5. Habiba Summary
 
-Habiba's work improved both presentation and safety.
+Habiba's updated responsibilities are Task 1 and Task 10.
 
-Task 3 delivered:
+Task 1 delivered:
 
-- Global CSS.
-- Monochrome design.
-- Responsive layout.
-- Form/table/card styling.
-- Client-side validation.
-- UI helpers like alerts, confirmations, image preview, and price preview.
+- `restaurant_db`.
+- `users` table.
+- `menu_items` table.
+- `orders` table.
+- Primary keys.
+- Foreign keys.
+- Role model.
+- Password hash storage.
+- Remember-me token storage.
+- Seed data.
 
-Task 12 delivered:
+Task 10 delivered:
 
-- Secure delete action.
-- Admin-only protection.
-- POST-only enforcement.
-- CSRF validation.
-- Order dependency check.
-- Image cleanup.
+- Admin-only menu item creation.
+- CSRF-protected form submission.
+- Field validation.
+- Price validation that allows zero.
+- Secure image upload.
+- MySQLi prepared insert.
+- Flash message and redirect flow.
 
-In defense, Habiba should emphasize that UI polish and backend safety both matter: the system must look consistent and also protect important data.
+In defense, Habiba should emphasize:
 
+```text
+Task 1 defines the data foundation.
+Task 10 safely writes new menu data into that foundation.
+```

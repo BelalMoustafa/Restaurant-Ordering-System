@@ -1,55 +1,71 @@
-# Phase 2 — Project Bootstrap & Configuration
+# Phase 2 - Project Bootstrap & Configuration
 
 ## Overall Goal
-Stand up the project skeleton on disk, establish the database connection layer, build the complete monochrome CSS design system, and create the shared PHP includes that every page in the application will rely on. By the end of this phase, the project has a working foundation — no feature pages yet, but all shared infrastructure is in place.
+
+Stand up the project skeleton, database connection layer, global assets, and shared PHP includes.
+
+By the end of this phase, the system has the reusable infrastructure needed by authentication, admin features, user features, and security hardening.
 
 ---
 
 ## Tasks in This Phase
 
-| Task # | Task Name                          | Assigned Developer | Status  |
-|--------|------------------------------------|--------------------|---------|
-| Task 2 | Project Skeleton & DB Connection   | Ziad Sameh         | Pending |
-| Task 3 | Global Assets — CSS & JS           | Habiba             | Pending |
-| Task 4 | Shared Includes — Header, Footer & Auth Helpers | Alaa  | Pending |
+| Task # | Task Name | Assigned Developer | Status |
+|--------|-----------|--------------------|--------|
+| Task 2 | Project Skeleton & DB Connection | Ziad Sameh | Completed |
+| Task 3 | Global Assets - CSS and JS | Hamza | Completed |
+| Task 4 | Shared Includes - Header, Footer and Auth Helpers | Alaa | Completed |
 
 ---
 
 ## Developer Assignment
 
-| Developer          | Role                        | Responsibility                                                  |
-|--------------------|-----------------------------|-----------------------------------------------------------------|
-| **Ziad Sameh**     | Developer                   | Task 2 — Create all directories and write `config/db.php`      |
-| **Habiba**         | Developer                   | Task 3 — Write the full monochrome CSS design system and JS helpers |
-| **Alaa**           | Developer                   | Task 4 — Write `includes/header.php`, `footer.php`, `auth.php` |
-| **Belal Moustafa** | Team Leader & Code Reviewer | Review and approve all three tasks before Phase 3 begins        |
+| Developer | Role | Responsibility |
+|-----------|------|----------------|
+| **Ziad Sameh** | Developer | Task 2 - Create directories and write `config/db.php`. |
+| **Hamza** | Developer | Task 3 - Write the monochrome CSS design system and global JavaScript helpers. |
+| **Alaa** | Developer | Task 4 - Write `includes/header.php`, `includes/footer.php`, and base auth helpers. |
+| **Belal Moustafa** | Team Leader & Code Reviewer | Review and approve all three tasks before Phase 3. |
+
+---
+
+## Assignment Update
+
+The final roster assigns Task 3 to **Hamza**.
+
+This reflects the corrected task swap between Hamza and Habiba:
+
+- Hamza owns Task 3: Global Assets.
+- Habiba owns Task 1 and Task 10.
 
 ---
 
 ## Task Dependencies Within This Phase
 
-```
-Task 2 (Skeleton) ──► Task 4 (Includes) — Alaa needs the directory structure in place
-Task 3 (CSS/JS)   ──► Task 4 (Includes) — header.php links to the stylesheet
-Task 2 & Task 3   can be worked on in PARALLEL
-Task 4            must start AFTER Task 2 and Task 3 are complete
+```text
+Task 2 (Skeleton) -> Task 4 (Includes)
+Task 3 (CSS/JS)   -> Task 4 (Includes)
+Task 2 and Task 3 can be worked on in parallel.
+Task 4 depends on the directories and assets being available.
 ```
 
 ---
 
 ## Reviewer
 
-**Belal Moustafa** is the designated reviewer for ALL tasks in this phase.  
-No task output moves to Phase 3 without Belal's explicit approval.
+**Belal Moustafa** is the designated reviewer for all tasks in this phase.
+
+No task output moves to Phase 3 without Belal's approval.
 
 ---
 
 ## Phase Completion Criteria
-- [ ] All directories from the project structure exist on disk
-- [ ] `config/db.php` connects to `restaurant_db` via MySQLi OO without errors
-- [ ] `assets/css/style.css` implements the full monochrome design system
-- [ ] `assets/js/main.js` provides client-side form validation helpers
-- [ ] `includes/auth.php` exposes `isLoggedIn()`, `isAdmin()`, and redirect helpers
-- [ ] `includes/header.php` renders the navbar and links the stylesheet
-- [ ] `includes/footer.php` closes the HTML layout cleanly
-- [ ] All files reviewed and approved by Belal Moustafa
+
+- [x] All directories from the project structure exist.
+- [x] `config/db.php` connects to `restaurant_db` through MySQLi OO.
+- [x] `assets/css/style.css` implements the monochrome design system.
+- [x] `assets/js/main.js` provides client-side validation and UI helpers.
+- [x] `includes/auth.php` exposes login, role, flash, and security helpers.
+- [x] `includes/header.php` renders the navbar and links the stylesheet.
+- [x] `includes/footer.php` closes the layout and loads JavaScript.
+- [x] All files reviewed and approved by Belal Moustafa.

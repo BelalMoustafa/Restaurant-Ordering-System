@@ -1,60 +1,146 @@
-# Task 12 — Menu Items: Delete
+# Task 12 - Menu Items: Delete
 
 ## Assignment
 
-| Field              | Detail                              |
-|--------------------|-------------------------------------|
-| **Assigned To**    | Habiba                              |
-| **Reviewed By**    | Belal Moustafa                      |
-| **Phase**          | Phase 4 — Admin Features            |
-| **Status**         | Pending                             |
-| **Depends On**     | Task 10 (items must exist to delete) |
-| **Blocks**         | Nothing directly                    |
+| Field | Detail |
+|-------|--------|
+| **Assigned To** | Hamza |
+| **Reviewed By** | Belal Moustafa |
+| **Phase** | Phase 4 - Admin Features |
+| **Status** | Completed |
+| **Depends On** | Task 10 (items must exist before deletion) |
+| **Blocks** | Nothing directly |
 
 ---
 
 ## Objective
-Build the delete handler at `admin/menu_items/delete.php`. This is a POST-only action file with no visible UI. It deletes a menu item from the database and removes its associated image file from disk.
 
----
+Build the delete handler at:
 
-## Deliverable
-`admin/menu_items/delete.php`
+```text
+admin/menu_items/delete.php
+```
+
+This is a POST-only action file with no visible UI. It deletes a menu item only when deletion is safe and removes the associated image file from disk.
 
 ---
 
 ## Page Requirements
 
-### Access Control
-- Call `requireLogin()` and `requireAdmin()` at the top.
+## Access Control
 
-### POST-Only Enforcement
-- If the request method is NOT POST, redirect to `index.php` immediately. This prevents accidental deletion via direct URL access.
+- Call `requireLogin()` at the top.
+- Call `requireAdmin()` at the top.
+- Guests and regular users must not be able to delete menu items.
 
-### Delete Sequence
-1. Read `$_POST['id']` — validate it is present and numeric
-2. Fetch the item from `menu_items` WHERE `id = ?` using a MySQLi OO prepared statement
-3. If item not found: set flash error "Item not found." and redirect to `index.php`
-4. If item has an `image_path`:
-   - Build the full server path: `$_SERVER['DOCUMENT_ROOT'] . '/restaurant_system/' . $image_path`
-   - Check if the file exists with `file_exists()`
-   - Delete it with `unlink()` if it exists
-5. Execute DELETE from `menu_items` WHERE `id = ?` using a MySQLi OO prepared statement
-6. Set flash message: `setFlashMessage('success', 'Menu item deleted successfully.')`
-7. Redirect to `index.php`
+## POST-Only Enforcement
 
-### Error Handling
-- Wrap the delete operation in a try/catch for database errors
-- If deletion fails, set flash error and redirect to `index.php`
+- If the request method is not POST, redirect to `index.php`.
+- Delete must never happen through a GET request.
+
+## CSRF Protection
+
+- Validate the submitted CSRF token before processing deletion.
+- Reject missing or invalid tokens.
+- Redirect with a flash error message if CSRF validation fails.
 
 ---
 
-## Acceptance Criteria (Reviewed by Belal Moustafa)
-- [ ] `requireLogin()` and `requireAdmin()` are both called
-- [ ] GET requests are rejected — POST only
-- [ ] Item fetched before deletion to retrieve `image_path`
-- [ ] Image file deleted from disk using `unlink()` if it exists
-- [ ] DELETE query uses MySQLi OO prepared statement
-- [ ] Wrapped in try/catch for error handling
-- [ ] Redirect to `index.php` with appropriate flash message
-- [ ] No HTML output — pure action file
+## Delete Sequence
+
+1. Read `$_POST['id']`.
+2. Validate that the ID is a positive integer.
+3. Fetch the menu item using a MySQLi OO prepared statement.
+4. If the item does not exist, redirect with an error message.
+5. Count existing orders that reference the item.
+6. If existing orders are found, block deletion and tell the admin to mark the item unavailable instead.
+7. Delete the row from `menu_items` using a MySQLi OO prepared statement.
+8. If deletion succeeds and an image exists, remove the image file from disk.
+9. Redirect to `index.php` with a success message.
+
+---
+
+## Required Existing Orders Check
+
+Before deleting a menu item, check:
+
+```sql
+SELECT COUNT(*) FROM orders WHERE menu_item_id = ?
+```
+
+If the count is greater than zero:
+
+- Do not delete the item.
+- Show a flash error.
+- Redirect to the menu item list.
+
+Reason:
+
+- Existing orders are historical records.
+- Deleting the item would damage order history.
+- The database also protects this rule with `ON DELETE RESTRICT`.
+
+---
+
+## Database Requirements
+
+All database actions must use Object-Oriented MySQLi prepared statements.
+
+Required queries:
+
+- Fetch item by ID.
+- Count related orders.
+- Delete item by ID.
+
+Do not use:
+
+- Raw SQL string interpolation.
+- User-controlled values directly inside SQL.
+
+---
+
+## File Cleanup Requirement
+
+If the menu item has an `image_path`:
+
+1. Build the absolute path from the project root.
+2. Check that the file exists.
+3. Delete it with `unlink()`.
+
+Image deletion must happen only after the database row is successfully deleted.
+
+---
+
+## Step-by-Step Instructions for Hamza
+
+1. Create or update `admin/menu_items/delete.php`.
+2. Start the session and include auth/database files before output.
+3. Protect the action with `requireLogin()` and `requireAdmin()`.
+4. Reject non-POST requests.
+5. Validate CSRF token.
+6. Validate the submitted item ID.
+7. Fetch the menu item before deletion.
+8. Count existing orders for that menu item.
+9. Block deletion when orders exist.
+10. Delete the menu item only when safe.
+11. Delete the uploaded image file if it exists.
+12. Redirect with an appropriate flash message.
+13. Hand the completed handler to Belal Moustafa for review.
+
+---
+
+## Acceptance Criteria
+
+- [x] `requireLogin()` is called.
+- [x] `requireAdmin()` is called.
+- [x] GET requests are rejected.
+- [x] CSRF token is validated.
+- [x] Invalid item IDs are rejected.
+- [x] Item is fetched before deletion.
+- [x] Existing orders are checked before deletion.
+- [x] Deletion is blocked when orders exist.
+- [x] Delete query uses MySQLi OO prepared statement.
+- [x] Uploaded image file is deleted after successful database deletion.
+- [x] Redirects with flash messages.
+- [x] No HTML output is produced.
+- [x] Belal Moustafa reviewed and approved the handler.
