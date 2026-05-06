@@ -7,7 +7,7 @@ function validateRequired(fieldId, errorId) {
     const value = field.value.trim();
     if (value === '') {
         error.textContent = 'This field is required.';
-        field.style.borderColor = '#000000';
+        field.style.borderColor = '#c0392b';
         field.style.borderWidth = '2px';
         return false;
     }
@@ -24,14 +24,14 @@ function validateEmail(fieldId, errorId) {
     const value = field.value.trim();
     if (value === '') {
         error.textContent = 'Email address is required.';
-        field.style.borderColor = '#000000';
+        field.style.borderColor = '#c0392b';
         field.style.borderWidth = '2px';
         return false;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
     if (!emailRegex.test(value)) {
         error.textContent = 'Please enter a valid email address.';
-        field.style.borderColor = '#000000';
+        field.style.borderColor = '#c0392b';
         field.style.borderWidth = '2px';
         return false;
     }
@@ -48,7 +48,7 @@ function validateMinLength(fieldId, errorId, min) {
     const value = field.value.trim();
     if (value.length < min) {
         error.textContent = 'Must be at least ' + min + ' characters long.';
-        field.style.borderColor = '#000000';
+        field.style.borderColor = '#c0392b';
         field.style.borderWidth = '2px';
         return false;
     }
@@ -110,12 +110,12 @@ document.addEventListener('DOMContentLoaded', function () {
             if (confirmField && confirmError && passwordField) {
                 if (confirmField.value.trim() === '') {
                     confirmError.textContent = 'Please confirm your password.';
-                    confirmField.style.borderColor = '#000000';
+                    confirmField.style.borderColor = '#c0392b';
                     confirmField.style.borderWidth = '2px';
                     isValid = false;
                 } else if (confirmField.value !== passwordField.value) {
                     confirmError.textContent = 'Passwords do not match.';
-                    confirmField.style.borderColor = '#000000';
+                    confirmField.style.borderColor = '#c0392b';
                     confirmField.style.borderWidth = '2px';
                     isValid = false;
                 } else {
@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const qty = parseInt(qtyField.value, 10);
                 if (isNaN(qty) || qty < 1 || qty > 20) {
                     qtyError.textContent = 'Quantity must be between 1 and 20.';
-                    qtyField.style.borderColor = '#000000';
+                    qtyField.style.borderColor = '#c0392b';
                     qtyField.style.borderWidth = '2px';
                     isValid = false;
                 } else {
@@ -282,8 +282,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 imagePreview.style.display = 'block';
                 imagePreview.style.maxWidth = '200px';
                 imagePreview.style.marginTop = '10px';
-                imagePreview.style.border = '1px solid #000000';
-                imagePreview.style.filter = 'grayscale(100%)';
+                imagePreview.style.border = '1.5px solid #BBBFCA';
+                imagePreview.style.filter = 'none';
+                imagePreview.style.borderRadius = '6px';
             };
             reader.readAsDataURL(file);
         });
